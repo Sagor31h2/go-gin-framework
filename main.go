@@ -37,8 +37,8 @@ func main() {
 	// 	})
 	// })
 
-	notesController := &controllers.NoteControllers{}
-	notesController.InitNotesControllersRoutes(router)
+	notesController := &controllers.NoteController{}
+	notesController.InitNotesControllerRoutes(router)
 
 	router.Run(":8000")
 

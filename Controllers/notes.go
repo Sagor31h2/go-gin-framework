@@ -3,26 +3,30 @@ package controllers
 import (
 	"net/http"
 
+	services "gin-test/Services"
+
 	"github.com/gin-gonic/gin"
 )
 
-type NoteControllers struct{}
+type NoteController struct {
+	noteService services.NotesService
+}
 
-func (n *NoteControllers) InitNotesControllersRoutes(router *gin.Engine) {
+func (n *NoteController) InitNotesControllerRoutes(router *gin.Engine) {
 	notes := router.Group("/notes")
 
-	notes.GET("/", n.GetNotes())
-	notes.POST("/", n.CreateNote())
+	notes.GET("/", n.GetNotes)
+	notes.POST("/", n.CreateNote)
 }
 
-func (n *NoteControllers) GetNotes() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, "message:notes")
-	}
+func (n *NoteController) GetNotes(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": n.noteService.GetNotes(),
+	})
 }
 
-func (n *NoteControllers) CreateNote() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, "message:note created")
-	}
+func (n *NoteController) CreateNote(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "note created",
+	})
 }
