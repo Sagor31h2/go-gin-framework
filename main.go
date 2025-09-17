@@ -2,6 +2,7 @@ package main
 
 import (
 	controllers "gin-test/Controllers"
+	database "gin-test/Internals/Database"
 
 	"github.com/gin-gonic/gin"
 )
@@ -9,7 +10,11 @@ import (
 func main() {
 
 	router := gin.Default()
+	db := database.InitDb()
 
+	if db != nil {
+		println("db connected")
+	}
 	// router.GET("/ping", func(c *gin.Context) {
 	// 	c.JSON(http.StatusOK, gin.H{
 	// 		"message": "pong",
