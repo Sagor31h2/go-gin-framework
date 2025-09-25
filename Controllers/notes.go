@@ -12,7 +12,8 @@ type NoteController struct {
 	noteService services.NotesService
 }
 
-func (n *NoteController) InitNotesControllerRoutes(router *gin.Engine) {
+func (n *NoteController) InitNotesControllerRoutes(router *gin.Engine, noteService services.NotesService) {
+	n.noteService = noteService
 	notes := router.Group("/notes")
 
 	notes.GET("/", n.GetNotes)
@@ -27,6 +28,6 @@ func (n *NoteController) GetNotes(ctx *gin.Context) {
 
 func (n *NoteController) CreateNote(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "note created",
+		"message": n.noteService.CreateNotes(),
 	})
 }
