@@ -1,54 +1,38 @@
 package main
 
 import (
-	controllers "gin-test/Controllers"
-	database "gin-test/Internals/Database"
-	services "gin-test/Services"
+	"log"
+
+	"gin-test/controllers"
+	"gin-test/internal/database"
+	"gin-test/services"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-
+	// Initialize Router
 	router := gin.Default()
-	db := database.InitDb()
 
-	if db != nil {
-		println("db connected")
+	// Initialize Database
+	db, err := database.InitDb("test.db")
+	if err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
+	log.Println("Database connected successfully")
+
+	// Initialize Services
+	notesService, err := services.NewNotesService(db)
+	if err != nil {
+		log.Fatalf("Failed to initialize notes service: %v", err)
 	}
 
-	notesService := &services.NotesService{}
-	notesService.InitNotesService(db)
-	// router.GET("/ping", func(c *gin.Context) {
-	// 	c.JSON(http.StatusOK, gin.H{
-	// 		"message": "pong",
-	// 	})
-	// })
+	// Initialize Controllers
+	controllers.NewNoteController(router, notesService)
 
-	// router.POST("/me", func(c *gin.Context) {
-
-	// 	type ReqBody struct {
-	// 		Email string `json:"email" binding:"required"`
-	// 		Name  string `json:"name"`
-	// 	}
-
-	// 	var reqBody ReqBody
-
-	// 	if err := c.BindJSON(&reqBody); err != nil {
-	// 		c.JSON(http.StatusBadRequest, gin.H{
-	// 			"error": err.Error(),
-	// 		})
-	// 	}
-
-	// 	c.JSON(http.StatusOK, gin.H{
-	// 		"Email": reqBody.Email,
-	// 		"Name":  reqBody.Name,
-	// 	})
-	// })
-
-	notesController := &controllers.NoteController{}
-	notesController.InitNotesControllerRoutes(router, *notesService)
-
-	router.Run(":8000")
-
+	// Start Server
+	log.Println("Starting server on :8000")
+	if err := router.Run(":8000"); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
 }
