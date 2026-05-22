@@ -11,6 +11,7 @@ import (
 
 func SetupRouter(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
+	r.Use(middleware.ErrorHandler())
 
 	// Services
 	authService := services.NewAuthService(db)
@@ -19,6 +20,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	// Controllers
 	authController := controllers.NewAuthController(authService)
 	notesController := controllers.NewNoteController(notesService)
+	shareController := controllers.NewShareController(notesService)
 
 	// API V1 Group
 	v1 := r.Group("/api/v1")
@@ -39,6 +41,9 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 			notes.GET("/:id", notesController.GetNoteByID)
 			notes.PUT("/:id", notesController.UpdateNote)
 			notes.DELETE("/:id", notesController.DeleteNote)
+			notes.POST("/:id/share", shareController.ShareNote)
+			notes.DELETE("/:id/share/:uid", shareController.RevokeShare)
+			notes.GET("/:id/shares", shareController.ListShares)
 		}
 	}
 

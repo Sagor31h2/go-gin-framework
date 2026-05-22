@@ -1,10 +1,10 @@
 package services
 
 import (
-	"errors"
 	"os"
 	"time"
 
+	apperrors "gin-test/internal/errors"
 	"gin-test/internal/models"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -28,11 +28,11 @@ func NewAuthService(db *gorm.DB) AuthService {
 func (s *authService) Register(email, password string) (*models.User, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, err
+		return nil, apperrors.Internal("failed to hash password")
 	}
 	user := &models.User{Email: email, PasswordHash: string(hash)}
 	if err := s.db.Create(user).Error; err != nil {
-		return nil, err
+		return nil, apperrors.Conflict("email already exists")
 	}
 	return user, nil
 }
@@ -40,10 +40,10 @@ func (s *authService) Register(email, password string) (*models.User, error) {
 func (s *authService) Login(email, password string) (string, error) {
 	var user models.User
 	if err := s.db.Where("email = ?", email).First(&user).Error; err != nil {
-		return "", errors.New("invalid credentials")
+		return "", apperrors.Unauthorized("invalid credentials")
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
-		return "", errors.New("invalid credentials")
+		return "", apperrors.Unauthorized("invalid credentials")
 	}
 
 	secret := os.Getenv("JWT_SECRET")

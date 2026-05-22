@@ -10,9 +10,9 @@ Last updated: 2026-05-21
 | 2 | Notes CRUD (auth-scoped) | ✅ Done |
 | 3 | Request Handling | ✅ Done |
 | 4 | Middleware | ✅ Done |
-| 5 | Note Sharing | ⬜ Not started |
+| 5 | Note Sharing | ✅ Done |
 | 6 | Route Organization | ✅ Done |
-| 7 | Central Error Handling | ⬜ Not started |
+| 7 | Central Error Handling | ✅ Done |
 | 8 | File Attachments | ⬜ Not started |
 | 9 | Testing | ⬜ Not started |
 | 10 | Config & Production Readiness | ⬜ Not started |
@@ -65,4 +65,38 @@ Tasks:
 
 ## Next Up
 
-→ Phase 5 (Note Sharing) - Join tables, relationships
+→ Phase 8 (File Attachments)
+
+## Phase 7 — Done
+
+- `AppError` type with `Status` + `Message` in `internal/errors/errors.go`
+- Helpers: `NotFound`, `Forbidden`, `BadRequest`, `Conflict`, `Internal`, `Unauthorized`
+- `ErrorHandler` middleware: reads `c.Errors.Last()`, type-asserts to `*AppError`, writes JSON
+- All services return typed `*AppError` instead of raw errors
+- All controllers use `c.Error(err)` + `ctx.Abort()` — no scattered `ctx.JSON` error calls
+- `ErrorHandler` registered globally in `routes.go`
+
+Files:
+- `internal/errors/errors.go`
+- `middleware/errorHandler.go`
+- `services/notesService.go` (updated)
+- `services/authService.go` (updated)
+- `controllers/notes.go` (updated)
+- `controllers/auth.go` (updated)
+- `controllers/share.go` (updated)
+- `routes/routes.go` (updated)
+
+## Phase 5 — Done
+
+- `NoteShare` model: note_id, shared_with_user, created_at
+- `POST /api/v1/notes/:id/share` — owner shares with user
+- `DELETE /api/v1/notes/:id/share/:uid` — owner revokes share
+- `GET /api/v1/notes/:id/shares` — owner lists who has access
+- `GET /api/v1/notes` now returns owned + shared notes (subquery)
+
+Files:
+- `internal/models/noteShareModel.go`
+- `services/notesService.go` (updated)
+- `controllers/share.go`
+- `routes/routes.go` (updated)
+- `main.go` (updated AutoMigrate)

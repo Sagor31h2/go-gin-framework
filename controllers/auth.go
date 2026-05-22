@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 
+	apperrors "gin-test/internal/errors"
 	"gin-test/services"
 
 	"github.com/gin-gonic/gin"
@@ -22,12 +23,14 @@ func (c *AuthController) Register(ctx *gin.Context) {
 		Password string `json:"password" binding:"required,min=6"`
 	}
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		_ = ctx.Error(apperrors.BadRequest(err.Error()))
+		ctx.Abort()
 		return
 	}
 	user, err := c.authService.Register(body.Email, body.Password)
 	if err != nil {
-		ctx.JSON(http.StatusConflict, gin.H{"error": "email already exists"})
+		_ = ctx.Error(err)
+		ctx.Abort()
 		return
 	}
 	ctx.JSON(http.StatusCreated, gin.H{"data": user})
@@ -39,12 +42,14 @@ func (c *AuthController) Login(ctx *gin.Context) {
 		Password string `json:"password" binding:"required"`
 	}
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		_ = ctx.Error(apperrors.BadRequest(err.Error()))
+		ctx.Abort()
 		return
 	}
 	token, err := c.authService.Login(body.Email, body.Password)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+		_ = ctx.Error(err)
+		ctx.Abort()
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"token": token})
