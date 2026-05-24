@@ -18,6 +18,7 @@ type NoteService interface {
 	ShareNote(ctx context.Context, noteID uint, ownerID uint, targetUserID uint) error
 	RevokeShare(ctx context.Context, noteID uint, ownerID uint, targetUserID uint) error
 	ListShares(ctx context.Context, noteID uint, ownerID uint) ([]models.NoteShare, error)
+	AddAttachment(ctx context.Context, noteID int, userID uint, fileName, filePath string) (*models.Attachment, error)
 }
 
 type notesService struct {
@@ -118,4 +119,27 @@ func (s *notesService) ListShares(ctx context.Context, noteID uint, ownerID uint
 		return nil, apperrors.Internal("failed to list shares")
 	}
 	return shares, nil
+}
+
+func (s *notesService) AddAttachment(ctx context.Context, noteID int, userID uint, fileName, filePath string) (*models.Attachment, error) {
+	// Verify ownership
+	var note models.Note
+	if err := s.db.WithContext(ctx).Where("id = ? AND user_id = ?", noteID, userID).First(&note).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, apperrors.NotFound("note not found or access denied")
+		}
+		return nil, apperrors.Internal("failed to verify note ownership")
+	}
+
+	attachment := models.Attachment{
+		NoteID:   noteID,
+		FileName: fileName,
+		FilePath: filePath,
+	}
+
+	if err := s.db.WithContext(ctx).Create(&attachment).Error; err != nil {
+		return nil, apperrors.Internal("failed to save attachment metadata")
+	}
+
+	return &attachment, nil
 }

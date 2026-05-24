@@ -3,6 +3,9 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strconv"
 
 	apperrors "gin-test/internal/errors"
 	models "gin-test/internal/models"
@@ -94,4 +97,50 @@ func (c *NoteController) DeleteNote(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"message": "note deleted successfully"})
+}
+
+func (c *NoteController) UploadAttachment(ctx *gin.Context) {
+	userID := ctx.MustGet("user_id").(uint)
+	noteIDStr := ctx.Param("id")
+	noteID, err := strconv.Atoi(noteIDStr)
+	if err != nil {
+		_ = ctx.Error(apperrors.BadRequest("invalid note id"))
+		ctx.Abort()
+		return
+	}
+
+	file, err := ctx.FormFile("file")
+	if err != nil {
+		_ = ctx.Error(apperrors.BadRequest("file is required"))
+		ctx.Abort()
+		return
+	}
+
+	uploadDir := "./uploads"
+	if err := os.MkdirAll(uploadDir, os.ModePerm); err != nil {
+		_ = ctx.Error(apperrors.Internal("failed to create upload directory"))
+		ctx.Abort()
+		return
+	}
+
+	// Simple filename collision avoidance (prepend timestamp)
+	fileName := fmt.Sprintf("%d_%s", os.Getpid(), file.Filename)
+	filePath := filepath.Join(uploadDir, fileName)
+
+	if err := ctx.SaveUploadedFile(file, filePath); err != nil {
+		_ = ctx.Error(apperrors.Internal("failed to save file"))
+		ctx.Abort()
+		return
+	}
+
+	attachment, serviceErr := c.noteService.AddAttachment(ctx.Request.Context(), noteID, userID, file.Filename, filePath)
+	if serviceErr != nil {
+		// Clean up file if DB fails
+		os.Remove(filePath)
+		_ = ctx.Error(serviceErr)
+		ctx.Abort()
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{"data": attachment})
 }

@@ -13,11 +13,28 @@ Last updated: 2026-05-21
 | 5 | Note Sharing | ✅ Done |
 | 6 | Route Organization | ✅ Done |
 | 7 | Central Error Handling | ✅ Done |
-| 8 | File Attachments | ⬜ Not started |
+| 8 | File Attachments | ✅ Done |
 | 9 | Testing | ⬜ Not started |
 | 10 | Config & Production Readiness | ⬜ Not started |
 
 ## Phase 1 — Done
+...
+## Phase 8 — Done
+
+- `Attachment` model: id, note_id, file_name, file_path, created_at
+- `Note` model updated with `Attachments` association
+- `POST /api/v1/notes/:id/attachments` — upload file (multipart/form-data)
+- Static file serving at `/uploads/*`
+- Ownership check: only owner can attach files
+- Simple filename collision avoidance (pid prefix)
+
+Files:
+- `internal/models/attachmentModel.go`
+- `internal/models/notesModel.go` (updated)
+- `services/notesService.go` (updated)
+- `controllers/notes.go` (updated)
+- `routes/routes.go` (updated)
+- `main.go` (updated AutoMigrate)
 
 - `User` model: id, email, password_hash, created_at, updated_at
 - `POST /auth/register` — bcrypt hash, return user (201)

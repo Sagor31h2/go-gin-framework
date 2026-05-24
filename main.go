@@ -14,9 +14,10 @@ func main() {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 
-	if err := db.AutoMigrate(&models.Note{}, &models.User{}, &models.NoteShare{}); err != nil {
+	if err := db.AutoMigrate(&models.Note{}, &models.User{}, &models.NoteShare{}, &models.Attachment{}); err != nil {
 		log.Fatalf("AutoMigrate failed: %v", err)
 	}
+
 
 	router := routes.SetupRouter(db)
 
