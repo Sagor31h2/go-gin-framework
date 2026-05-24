@@ -2,10 +2,13 @@ package routes
 
 import (
 	"gin-test/controllers"
+	_ "gin-test/docs"
 	"gin-test/middleware"
 	"gin-test/services"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/gorm"
 )
 
@@ -15,6 +18,9 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	// Static files
 	r.Static("/uploads", "./uploads")
+
+	// Swagger
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Services
 	authService := services.NewAuthService(db)

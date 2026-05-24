@@ -19,6 +19,18 @@ func NewShareController(noteService services.NoteService) *ShareController {
 }
 
 // POST /api/v1/notes/:id/share
+// ShareNote godoc
+// @Summary Share a note with another user
+// @Description Grant access to a note for another user
+// @Tags shares
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "Note ID"
+// @Param body body object true "Target User ID"
+// @Success 200 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /notes/{id}/share [post]
 func (c *ShareController) ShareNote(ctx *gin.Context) {
 	ownerID := ctx.MustGet("user_id").(uint)
 	noteID, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
@@ -44,6 +56,16 @@ func (c *ShareController) ShareNote(ctx *gin.Context) {
 }
 
 // DELETE /api/v1/notes/:id/share/:uid
+// RevokeShare godoc
+// @Summary Revoke a note share
+// @Description Remove access to a note for another user
+// @Tags shares
+// @Security BearerAuth
+// @Param id path string true "Note ID"
+// @Param uid path string true "User ID"
+// @Success 200 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /notes/{id}/share/{uid} [delete]
 func (c *ShareController) RevokeShare(ctx *gin.Context) {
 	ownerID := ctx.MustGet("user_id").(uint)
 	noteID, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
@@ -67,6 +89,16 @@ func (c *ShareController) RevokeShare(ctx *gin.Context) {
 }
 
 // GET /api/v1/notes/:id/shares
+// ListShares godoc
+// @Summary List all shares for a note
+// @Description Get a list of users who have access to the note
+// @Tags shares
+// @Security BearerAuth
+// @Produce json
+// @Param id path string true "Note ID"
+// @Success 200 {object} map[string][]models.NoteShare
+// @Failure 404 {object} map[string]string
+// @Router /notes/{id}/shares [get]
 func (c *ShareController) ListShares(ctx *gin.Context) {
 	ownerID := ctx.MustGet("user_id").(uint)
 	noteID, err := strconv.ParseUint(ctx.Param("id"), 10, 64)

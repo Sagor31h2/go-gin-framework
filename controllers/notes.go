@@ -22,6 +22,18 @@ func NewNoteController(noteService services.NoteService) *NoteController {
 	return &NoteController{noteService: noteService}
 }
 
+// GetNotes godoc
+// @Summary List all notes
+// @Description Get all owned and shared notes for the authenticated user
+// @Tags notes
+// @Security BearerAuth
+// @Produce json
+// @Param search query string false "Search by title"
+// @Param limit query int false "Pagination limit" default(10)
+// @Param page query int false "Pagination page" default(1)
+// @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]string
+// @Router /notes [get]
 func (c *NoteController) GetNotes(ctx *gin.Context) {
 	userID := ctx.MustGet("user_id").(uint)
 
@@ -45,6 +57,16 @@ func (c *NoteController) GetNotes(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"data": notes, "limit": limit, "page": page})
 }
 
+// GetNoteByID godoc
+// @Summary Get a note by ID
+// @Description Fetch a specific note owned by the user
+// @Tags notes
+// @Security BearerAuth
+// @Produce json
+// @Param id path string true "Note ID"
+// @Success 200 {object} map[string]models.Note
+// @Failure 404 {object} map[string]string
+// @Router /notes/{id} [get]
 func (c *NoteController) GetNoteByID(ctx *gin.Context) {
 	userID := ctx.MustGet("user_id").(uint)
 	note, err := c.noteService.GetNoteByID(ctx.Request.Context(), ctx.Param("id"), userID)
@@ -56,6 +78,17 @@ func (c *NoteController) GetNoteByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"data": note})
 }
 
+// CreateNote godoc
+// @Summary Create a new note
+// @Description Add a new note to the user's collection
+// @Tags notes
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param note body models.Note true "Note object"
+// @Success 201 {object} map[string]models.Note
+// @Failure 400 {object} map[string]string
+// @Router /notes [post]
 func (c *NoteController) CreateNote(ctx *gin.Context) {
 	userID := ctx.MustGet("user_id").(uint)
 	var note models.Note
@@ -73,6 +106,18 @@ func (c *NoteController) CreateNote(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{"data": note})
 }
 
+// UpdateNote godoc
+// @Summary Update an existing note
+// @Description Modify a note's title or status
+// @Tags notes
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "Note ID"
+// @Param note body models.Note true "Updated note object"
+// @Success 200 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /notes/{id} [put]
 func (c *NoteController) UpdateNote(ctx *gin.Context) {
 	userID := ctx.MustGet("user_id").(uint)
 	var note models.Note
@@ -89,6 +134,15 @@ func (c *NoteController) UpdateNote(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "note updated successfully"})
 }
 
+// DeleteNote godoc
+// @Summary Delete a note
+// @Description Remove a note from the user's collection
+// @Tags notes
+// @Security BearerAuth
+// @Param id path string true "Note ID"
+// @Success 200 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /notes/{id} [delete]
 func (c *NoteController) DeleteNote(ctx *gin.Context) {
 	userID := ctx.MustGet("user_id").(uint)
 	if err := c.noteService.DeleteNote(ctx.Request.Context(), ctx.Param("id"), userID); err != nil {
@@ -99,6 +153,18 @@ func (c *NoteController) DeleteNote(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "note deleted successfully"})
 }
 
+// UploadAttachment godoc
+// @Summary Upload an attachment to a note
+// @Description Attach a file to a specific note
+// @Tags notes
+// @Security BearerAuth
+// @Accept multipart/form-data
+// @Produce json
+// @Param id path string true "Note ID"
+// @Param file formData file true "File to upload"
+// @Success 201 {object} map[string]models.Attachment
+// @Failure 400 {object} map[string]string
+// @Router /notes/{id}/attachments [post]
 func (c *NoteController) UploadAttachment(ctx *gin.Context) {
 	userID := ctx.MustGet("user_id").(uint)
 	noteIDStr := ctx.Param("id")

@@ -14,10 +14,42 @@ Last updated: 2026-05-21
 | 6 | Route Organization | ✅ Done |
 | 7 | Central Error Handling | ✅ Done |
 | 8 | File Attachments | ✅ Done |
-| 9 | Testing | ⬜ Not started |
-| 10 | Config & Production Readiness | ⬜ Not started |
+| 9 | Testing | ✅ Done |
+| 10 | Swagger & Auto-Open | ✅ Done |
 
 ## Phase 1 — Done
+...
+## Phase 10 — Done
+
+- Swagger documentation integrated via `swag`
+- All endpoints annotated with metadata
+- Swagger UI available at `/swagger/index.html`
+- Automatic browser opening on application start
+- `xdg-open` (Linux), `open` (Mac), `rundll32` (Windows) support
+
+Files:
+- `main.go` (updated)
+- `routes/routes.go` (updated)
+- `controllers/auth.go` (updated)
+- `controllers/notes.go` (updated)
+- `controllers/share.go` (updated)
+- `docs/` (generated)
+...
+## Phase 9 — Done
+
+- Unit tests for `AuthService` (Register, Login)
+- Unit tests for `NotesService` (CRUD, Sharing, Attachments)
+- Integration tests for `AuthController` (Register, Login)
+- Integration tests for `NotesController` (Create, List)
+- In-memory SQLite for isolated, fast tests
+- `httptest` for API endpoint verification
+
+Files:
+- `tests/integration/setup_test.go`
+- `tests/integration/auth_test.go`
+- `tests/integration/notes_test.go`
+- `services/authService_test.go`
+- `services/notesService_test.go`
 ...
 ## Phase 8 — Done
 

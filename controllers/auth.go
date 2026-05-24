@@ -17,6 +17,16 @@ func NewAuthController(authService services.AuthService) *AuthController {
 	return &AuthController{authService: authService}
 }
 
+// Register godoc
+// @Summary Register a new user
+// @Description Create a new user account
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param body body object true "User Registration Details"
+// @Success 201 {object} map[string]models.User
+// @Failure 400 {object} map[string]string
+// @Router /auth/register [post]
 func (c *AuthController) Register(ctx *gin.Context) {
 	var body struct {
 		Email    string `json:"email" binding:"required,email"`
@@ -36,6 +46,16 @@ func (c *AuthController) Register(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{"data": user})
 }
 
+// Login godoc
+// @Summary Login a user
+// @Description Authenticate user and return JWT
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param body body object true "User Login Details"
+// @Success 200 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Router /auth/login [post]
 func (c *AuthController) Login(ctx *gin.Context) {
 	var body struct {
 		Email    string `json:"email" binding:"required,email"`
