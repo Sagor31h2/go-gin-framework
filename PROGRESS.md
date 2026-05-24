@@ -16,8 +16,21 @@ Last updated: 2026-05-21
 | 8 | File Attachments | ✅ Done |
 | 9 | Testing | ✅ Done |
 | 10 | Swagger & Auto-Open | ✅ Done |
+| 11 | Config & Shutdown | ✅ Done |
 
 ## Phase 1 — Done
+...
+## Phase 11 — Done
+
+- Centralized configuration in `internal/config/config.go`
+- `.env` support via `godotenv`
+- Graceful shutdown using `http.Server` and `os/signal`
+- Handles `SIGINT` and `SIGTERM` with 5s timeout
+
+Files:
+- `internal/config/config.go`
+- `main.go` (updated)
+- `.env`
 ...
 ## Phase 10 — Done
 
